@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Solidarity Escape Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #000; color: white; font-family: sans-serif; }
+    canvas { display: block; margin: auto; }
+  </style>
+</head>
+<body>
+<script>
+class BootScene extends Phaser.Scene {
+  constructor() { super('BootScene'); }
+  preload() {
+    console.log('Preloading...');
+    this.load.image('circle', 'https://i.imgur.com/OQ8f1jG.png');
+    this.load.audio('click', 'https://freesound.org/data/previews/256/256113_3263906-lq.mp3');
+  }
+  create() {
+    console.log('BootScene created');
+    this.scene.start('WebRoom');
+  }
+}
+
+class WebRoom extends Phaser.Scene {
+  constructor() { super('WebRoom'); }
+  create() {
+    console.log('WebRoom created');
+    this.sound.add('click');
+    this.circles = this.add.group();
+    for (let i = 0; i < 6; i++) {
+      let x = 100 + i * 100;
+      let y = 300;
+      console.log('Placing circle at', x, y);
+      let c = this.add.image(x, y, 'circle').setInteractive();
+      c.setScale(0.3);
+      c.on('pointerdown', () => this.untangle(c));
+      this.circles.add(c);
+    }
+    this.add.text(100, 100, '🧵 Untangle the Solidarity Web!', { font: '24px Arial', fill: '#ffffff' });
+  }
+  untangle(circle) {
+    this.sound.play('click');
+    circle.destroy();
+    if (this.circles.countActive() === 0) {
+      this.add.text(200, 550, '🎉 Code piece: A', { font: '24px Arial', fill: '#0f0' });
+      this.time.delayedCall(2000, () => this.scene.start('FinalScene'));
+    }
+  }
+}
+
+class FinalScene extends Phaser.Scene {
+  constructor() { super('FinalScene'); }
+  create() {
+    this.add.text(180, 300, '🎉 You escaped! More rooms coming soon!', { font: '24px Arial', fill: '#00ffff' });
+  }
+}
+
+new Phaser.Game({
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  backgroundColor: '#222',
+  scene: [BootScene, WebRoom, FinalScene]
+});
+</script>
+</body>
+</html>
